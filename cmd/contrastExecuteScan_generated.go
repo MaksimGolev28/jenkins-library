@@ -29,6 +29,7 @@ type contrastExecuteScanOptions struct {
 	ApplicationID               string `json:"applicationId,omitempty"`
 	VulnerabilityThresholdTotal int    `json:"vulnerabilityThresholdTotal,omitempty"`
 	CheckForCompliance          bool   `json:"checkForCompliance,omitempty"`
+	SarifAsync                  bool   `json:"sarifAsync,omitempty"`
 }
 
 type contrastExecuteScanReports struct {
@@ -199,6 +200,7 @@ func addContrastExecuteScanFlags(cmd *cobra.Command, stepConfig *contrastExecute
 	cmd.Flags().StringVar(&stepConfig.ApplicationID, "applicationId", os.Getenv("PIPER_applicationId"), "Application UUID. It's the Last UUID of application View URL")
 	cmd.Flags().IntVar(&stepConfig.VulnerabilityThresholdTotal, "vulnerabilityThresholdTotal", 0, "Threshold for maximum number of allowed vulnerabilities.")
 	cmd.Flags().BoolVar(&stepConfig.CheckForCompliance, "checkForCompliance", false, "If set to true, the piper step checks for compliance based on vulnerability thresholds. Example - If total vulnerabilities are 10 and vulnerabilityThresholdTotal is set as 0, then the steps throws an compliance error.")
+	cmd.Flags().BoolVar(&stepConfig.SarifAsync, "sarifAsync", false, "Generate SARIF asynchronously to avoid timeouts")
 
 	cmd.MarkFlagRequired("userApiKey")
 	cmd.MarkFlagRequired("serviceKey")
@@ -327,6 +329,15 @@ func contrastExecuteScanMetadata() config.StepData {
 					},
 					{
 						Name:        "checkForCompliance",
+						ResourceRef: []config.ResourceReference{},
+						Scope:       []string{"PARAMETERS", "STAGES", "STEPS"},
+						Type:        "bool",
+						Mandatory:   false,
+						Aliases:     []config.Alias{},
+						Default:     false,
+					},
+					{
+						Name:        "sarifAsync",
 						ResourceRef: []config.ResourceReference{},
 						Scope:       []string{"PARAMETERS", "STAGES", "STEPS"},
 						Type:        "bool",

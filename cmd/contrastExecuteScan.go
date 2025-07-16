@@ -52,7 +52,6 @@ func validateConfigs(config *contrastExecuteScanOptions) error {
 		"username":       config.Username,
 		"serviceKey":     config.ServiceKey,
 	}
-
 	for k, v := range validations {
 		if v == "" {
 			return fmt.Errorf("%s is empty", k)
@@ -67,6 +66,27 @@ func validateConfigs(config *contrastExecuteScanOptions) error {
 }
 
 func runContrastExecuteScan(config *contrastExecuteScanOptions, telemetryData *telemetry.CustomData, utils contrastExecuteScanUtils) (reports []piperutils.Path, err error) {
+	if config.SarifAsync {
+		client := contrast.NewClient(config.UserAPIKey, config.ServiceKey, config.Username, config.OrganizationID, config.Server)
+
+		uuid, err := client.StartAsyncSarifGeneration(config.ApplicationID)
+		if err != nil {
+			log.Entry().WithError(err).Fatal("Failed to start async SARIF generation")
+		}
+
+		downloadUrl, err := client.PollSarifGenerationStatus(uuid)
+		if err != nil {
+			log.Entry().WithError(err).Fatal("SARIF generation failed")
+		}
+
+		data, err := client.DownloadSarif(downloadUrl)
+		if err != nil {
+			log.Entry().WithError(err).Fatal("SARIF download failed")
+		}
+
+		utils.FileWrite("contrast.sarif", data, 0644)
+	}
+
 	err = validateConfigs(config)
 	if err != nil {
 		log.Entry().Errorf("config is invalid: %v", err)

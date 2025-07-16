@@ -53,3 +53,8 @@ cmd/checkmarx/piper_checkmarx_report.html
 cmd/fortify/piper_fortify_report.html
 cmd/fortify/piper_fortify_report.json
 cmd/toolruns
+readme.md
+contrast.sarif
+piper-local
+/toolruns
+/contrast

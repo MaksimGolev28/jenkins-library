@@ -110,6 +110,14 @@ spec:
           - PARAMETERS
           - STAGES
           - STEPS
+      - name: sarifAsync
+        type: bool
+        default: false
+        description: "Generate SARIF asynchronously to avoid timeouts"
+        scope:
+          - PARAMETERS
+          - STAGES
+          - STEPS
   containers:
     - image: ""
   outputs:
